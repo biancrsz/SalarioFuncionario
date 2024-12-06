@@ -1,0 +1,74 @@
+package salariofuncionario;
+
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.Scanner;
+
+public class SalarioFuncionario {
+    private String nome;
+    private Date dataAdmissao;
+    private float valorHora;
+    private float horasTrabalhadas;
+
+    public SalarioFuncionario(String nome, String dataAdmissaoString, float valorHora, float horasTrabalhadas) throws ParseException {
+        this.nome = nome;
+        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+        this.dataAdmissao = sdf.parse(dataAdmissaoString);
+        this.valorHora = valorHora;
+        this.horasTrabalhadas = horasTrabalhadas;
+    }
+
+    public int calcularTempoEmpresa() {
+        Calendar hoje = Calendar.getInstance();
+        hoje.set(Calendar.MONTH, Calendar.DECEMBER);
+        hoje.set(Calendar.YEAR, 2024); 
+        Date dataAtual = hoje.getTime();
+
+        long diferencaEmMilissegundos = dataAtual.getTime() - dataAdmissao.getTime();
+        long umAnoEmMilissegundos = 1000L * 60L * 60L * 24L * 365L;
+        return (int) (diferencaEmMilissegundos / umAnoEmMilissegundos);
+    }
+
+    public float calcularSalario() {
+        float salarioBase = valorHora * horasTrabalhadas;
+        int tempoEmpresa = calcularTempoEmpresa();
+
+        if (tempoEmpresa >= 10) {
+            salarioBase *= 1.10;
+        } else if (tempoEmpresa >= 5) {
+            salarioBase *= 1.05;
+        }
+
+        return salarioBase;
+    }
+
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+
+        System.out.print("Digite o nome do funcionário: ");
+        String nome = scanner.nextLine();
+
+        System.out.print("Digite a data de admissão (dd/MM/aaaa): ");
+        String dataAdmissao = scanner.nextLine();
+
+        System.out.print("Digite o valor da hora trabalhada: ");
+        float valorHora = scanner.nextFloat();
+
+        System.out.print("Digite o número de horas trabalhadas: ");
+        float horasTrabalhadas = scanner.nextFloat();
+
+        try {
+            SalarioFuncionario funcionario = new SalarioFuncionario(nome, dataAdmissao, valorHora, horasTrabalhadas);
+            int tempoEmpresa = funcionario.calcularTempoEmpresa();
+            float salario = funcionario.calcularSalario();
+
+            System.out.println("\nNome: " + funcionario.nome);
+            System.out.println("Tempo de empresa: " + tempoEmpresa + " anos");
+            System.out.println("Salário a receber: R$" + String.format("%.2f", salario));
+        } catch (ParseException e) {
+            System.out.println("Erro ao formatar a data de admissão.");
+        }
+    }
+}
